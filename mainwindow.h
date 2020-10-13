@@ -19,11 +19,14 @@ public:
     ~MainWindow();
     int client_sock;
     char data[BUF_SIZE];
-
+    char selected_ap[BUF_SIZE];
+    std::vector<std::string> selected_client;
 
 private slots:
     void on_btn_select_clicked();
     void on_btn_deauth_clicked();
+
+    void on_btn_all_clicked();
 
 private:
     Ui::MainWindow *ui;

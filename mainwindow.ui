@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>562</width>
+    <width>943</width>
     <height>745</height>
    </rect>
   </property>
@@ -14,45 +14,7 @@
    <string>MainWindow</string>
   </property>
   <widget class="QWidget" name="centralwidget">
-   <layout class="QVBoxLayout" name="verticalLayout_4">
-    <item>
-     <widget class="QFrame" name="frame">
-      <property name="frameShape">
-       <enum>QFrame::StyledPanel</enum>
-      </property>
-      <property name="frameShadow">
-       <enum>QFrame::Raised</enum>
-      </property>
-      <layout class="QHBoxLayout" name="horizontalLayout">
-       <item>
-        <widget class="QLabel" name="label">
-         <property name="font">
-          <font>
-           <pointsize>30</pointsize>
-          </font>
-         </property>
-         <property name="text">
-          <string>AP List</string>
-         </property>
-        </widget>
-       </item>
-       <item>
-        <widget class="QPushButton" name="btn_select">
-         <property name="text">
-          <string>select</string>
-         </property>
-        </widget>
-       </item>
-       <item>
-        <widget class="QPushButton" name="btn_deauth">
-         <property name="text">
-          <string>deauth attack</string>
-         </property>
-        </widget>
-       </item>
-      </layout>
-     </widget>
-    </item>
+   <layout class="QVBoxLayout" name="verticalLayout">
     <item>
      <widget class="QFrame" name="frame_3">
       <property name="frameShape">
@@ -62,6 +24,40 @@
        <enum>QFrame::Raised</enum>
       </property>
       <layout class="QVBoxLayout" name="verticalLayout_3">
+       <item>
+        <widget class="QFrame" name="frame">
+         <property name="frameShape">
+          <enum>QFrame::StyledPanel</enum>
+         </property>
+         <property name="frameShadow">
+          <enum>QFrame::Raised</enum>
+         </property>
+         <layout class="QHBoxLayout" name="horizontalLayout">
+          <item>
+           <widget class="QLabel" name="label">
+            <property name="font">
+             <font>
+              <pointsize>25</pointsize>
+             </font>
+            </property>
+            <property name="text">
+             <string>AP List  (Wifi)</string>
+            </property>
+            <property name="alignment">
+             <set>Qt::AlignCenter</set>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QPushButton" name="btn_select">
+            <property name="text">
+             <string>select AP</string>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </widget>
+       </item>
        <item>
         <widget class="QListWidget" name="listWidget">
          <property name="font">
@@ -87,19 +83,48 @@
       </property>
       <layout class="QVBoxLayout" name="verticalLayout_2">
        <item>
-        <widget class="QLabel" name="label_2">
-         <property name="font">
-          <font>
-           <pointsize>20</pointsize>
-          </font>
+        <widget class="QFrame" name="frame_4">
+         <property name="frameShape">
+          <enum>QFrame::StyledPanel</enum>
          </property>
-         <property name="text">
-          <string>log</string>
+         <property name="frameShadow">
+          <enum>QFrame::Raised</enum>
          </property>
+         <layout class="QHBoxLayout" name="horizontalLayout_2">
+          <item>
+           <widget class="QLabel" name="label_2">
+            <property name="font">
+             <font>
+              <pointsize>25</pointsize>
+             </font>
+            </property>
+            <property name="text">
+             <string>Station List  (Client)</string>
+            </property>
+            <property name="alignment">
+             <set>Qt::AlignCenter</set>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QPushButton" name="btn_all">
+            <property name="text">
+             <string>select ALL</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QPushButton" name="btn_deauth">
+            <property name="text">
+             <string>deauth attack</string>
+            </property>
+           </widget>
+          </item>
+         </layout>
         </widget>
        </item>
        <item>
-        <widget class="QTextBrowser" name="textBrowser">
+        <widget class="QListWidget" name="listWidget_2">
          <property name="font">
           <font>
            <pointsize>20</pointsize>
@@ -117,8 +142,8 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>562</width>
-     <height>24</height>
+     <width>943</width>
+     <height>22</height>
     </rect>
    </property>
   </widget>
