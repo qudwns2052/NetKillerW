@@ -25,49 +25,17 @@
       </property>
       <layout class="QVBoxLayout" name="verticalLayout_3">
        <item>
-        <widget class="QFrame" name="frame">
-         <property name="frameShape">
-          <enum>QFrame::StyledPanel</enum>
-         </property>
-         <property name="frameShadow">
-          <enum>QFrame::Raised</enum>
-         </property>
-         <layout class="QHBoxLayout" name="horizontalLayout">
-          <item>
-           <widget class="QLabel" name="label">
-            <property name="font">
-             <font>
-              <pointsize>25</pointsize>
-             </font>
-            </property>
-            <property name="text">
-             <string>AP List  (Wifi)</string>
-            </property>
-            <property name="alignment">
-             <set>Qt::AlignCenter</set>
-            </property>
-           </widget>
-          </item>
-          <item>
-           <widget class="QPushButton" name="btn_select">
-            <property name="text">
-             <string>select AP</string>
-            </property>
-           </widget>
-          </item>
-         </layout>
-        </widget>
-       </item>
-       <item>
-        <widget class="QListWidget" name="listWidget">
-         <property name="font">
-          <font>
-           <pointsize>20</pointsize>
-          </font>
-         </property>
-         <property name="modelColumn">
-          <number>0</number>
-         </property>
+        <widget class="QTableWidget" name="tableWidget">
+         <column>
+          <property name="text">
+           <string>SSID</string>
+          </property>
+         </column>
+         <column>
+          <property name="text">
+           <string>Mac address</string>
+          </property>
+         </column>
         </widget>
        </item>
       </layout>
@@ -83,52 +51,23 @@
       </property>
       <layout class="QVBoxLayout" name="verticalLayout_2">
        <item>
-        <widget class="QFrame" name="frame_4">
-         <property name="frameShape">
-          <enum>QFrame::StyledPanel</enum>
-         </property>
-         <property name="frameShadow">
-          <enum>QFrame::Raised</enum>
-         </property>
-         <layout class="QHBoxLayout" name="horizontalLayout_2">
-          <item>
-           <widget class="QLabel" name="label_2">
-            <property name="font">
-             <font>
-              <pointsize>25</pointsize>
-             </font>
-            </property>
-            <property name="text">
-             <string>Station List  (Client)</string>
-            </property>
-            <property name="alignment">
-             <set>Qt::AlignCenter</set>
-            </property>
-           </widget>
-          </item>
-          <item>
-           <widget class="QPushButton" name="btn_all">
-            <property name="text">
-             <string>select ALL</string>
-            </property>
-           </widget>
-          </item>
-          <item>
-           <widget class="QPushButton" name="btn_deauth">
-            <property name="text">
-             <string>deauth attack</string>
-            </property>
-           </widget>
-          </item>
-         </layout>
+        <widget class="QTableWidget" name="tableWidget_2">
+         <column>
+          <property name="text">
+           <string>Mac address</string>
+          </property>
+         </column>
+         <column>
+          <property name="text">
+           <string>Signal</string>
+          </property>
+         </column>
         </widget>
        </item>
        <item>
-        <widget class="QListWidget" name="listWidget_2">
-         <property name="font">
-          <font>
-           <pointsize>20</pointsize>
-          </font>
+        <widget class="QPushButton" name="btn_all">
+         <property name="text">
+          <string>ALL deauth attack</string>
          </property>
         </widget>
        </item>

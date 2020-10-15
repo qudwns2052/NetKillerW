@@ -2,6 +2,7 @@
 #define MAINWINDOW_H
 
 #include <QMainWindow>
+#include <QPushButton>
 #include <socket.h>
 
 QT_BEGIN_NAMESPACE
@@ -19,14 +20,15 @@ public:
     ~MainWindow();
     int client_sock;
     char data[BUF_SIZE];
+    char buf[BUF_SIZE];
     char selected_ap[BUF_SIZE];
     std::vector<std::string> selected_client;
+    QList<QPushButton *> btn_list;
 
 private slots:
-    void on_btn_select_clicked();
-    void on_btn_deauth_clicked();
-
     void on_btn_all_clicked();
+    void on_tableWidget_cellClicked(int row, int column);
+    void on_tableWidget_2_cellClicked(int row, int column);
 
 private:
     Ui::MainWindow *ui;
