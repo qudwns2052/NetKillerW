@@ -25,3 +25,43 @@ bool connect_sock(int * client_sock, int server_port)
 
     return ret;
 }
+
+bool send_data(int client_sock, char *data)
+{
+    char result[BUF_SIZE] = {0};
+    size_t data_length = strlen(data);
+    result[0] = (data_length >> 8) & 0xFF;
+    result[1] = data_length & 0xFF;
+    memcpy(result + 2, data, strlen(data));
+
+    if (write(client_sock, result, strlen(data) + 2) <= 0)
+    {
+        return false;
+    }
+    return true;
+}
+
+bool recv_data(int client_sock, char *data)
+{
+    unsigned char buf[BUF_SIZE] = {0};
+    char result[BUF_SIZE] = {0};
+    size_t data_length = 0;
+
+    if (read(client_sock, buf, 2) < 0)
+    {
+        return false;
+    }
+
+    data_length = (buf[0] << 8) + buf[1];
+
+    if (read(client_sock, result, data_length) <= 0)
+    {
+        return false;
+    }
+
+    result[data_length] = '\0';
+
+    memcpy(data, result, sizeof(result));
+
+    return true;
+}

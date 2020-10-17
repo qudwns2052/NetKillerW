@@ -18,11 +18,13 @@ DEFINES += QT_DEPRECATED_WARNINGS
 SOURCES += \
     main.cpp \
     mainwindow.cpp \
-    socket.cpp
+    socket.cpp \
+    thread.cpp
 
 HEADERS += \
     mainwindow.h \
-    socket.h
+    socket.h \
+    thread.h
 
 FORMS += \
     mainwindow.ui

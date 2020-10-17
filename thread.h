@@ -1,0 +1,33 @@
+#pragma once
+
+#include <QThread>
+#include <socket.h>
+#include "socket.h"
+
+struct ScanThread : QThread {
+    Q_OBJECT
+
+public:
+    ScanThread(int sock, bool isAp) {
+        client_sock = sock;
+        this->isAp = isAp;
+    }
+
+    ~ScanThread() override {
+    }
+
+    bool active_{false};
+    int client_sock;
+    bool isAp;
+protected:
+    bool open();
+    bool close();
+
+protected:
+    void run() override;
+
+public:
+signals:
+    void captured(char * data);
+};
+

@@ -3,13 +3,13 @@
 
 #include <QMainWindow>
 #include <QPushButton>
-#include <socket.h>
+#include <QMap>
+#include "socket.h"
+#include "thread.h"
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
 QT_END_NAMESPACE
-
-static const int BUF_SIZE=1024;
 
 class MainWindow : public QMainWindow
 {
@@ -21,14 +21,22 @@ public:
     int client_sock;
     char data[BUF_SIZE];
     char buf[BUF_SIZE];
-    char selected_ap[BUF_SIZE];
-    std::vector<std::string> selected_client;
-    QList<QPushButton *> btn_list;
+    QList<QPushButton *> ap_btn_list;
+    QList<QPushButton *> station_btn_list;
+
+    QMap <QString, QString> ap_map;
+    QMap <QString, QString> station_map;
+
+    ScanThread * scanThread_;
 
 private slots:
+    void btn_ap_clicked();
+    void btn_station_clicked();
     void on_btn_all_clicked();
-    void on_tableWidget_cellClicked(int row, int column);
-    void on_tableWidget_2_cellClicked(int row, int column);
+    void on_btn_start_clicked();
+    void processCaptured(char* data);
+
+    void on_btn_stop_clicked();
 
 private:
     Ui::MainWindow *ui;
