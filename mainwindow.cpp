@@ -18,11 +18,15 @@ MainWindow::MainWindow(QWidget *parent)
     verticalHeader2->setDefaultSectionSize(80);
 #endif
 
-    ui->tableWidget->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
-    ui->tableWidget_2->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
+//    ui->tableWidget->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
+//    ui->tableWidget_2->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
+
+    ui->tableWidget->horizontalHeader()->setStretchLastSection(true);
+    ui->tableWidget_2->horizontalHeader()->setStretchLastSection(true);
 
     ui->tableWidget->verticalScrollBar()->setStyleSheet("QScrollBar:vertical { width: 70px; }");
     ui->tableWidget_2->verticalScrollBar()->setStyleSheet("QScrollBar:vertical { width: 70px; }");
+
 
     // start Server
     {
@@ -51,14 +55,8 @@ MainWindow::MainWindow(QWidget *parent)
     ui->tableWidget->setRowCount(0);
     ui->tableWidget->setHorizontalHeaderLabels(label);
 
-    ui->tableWidget->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
-
-//    int column_width = ui->tableWidget->columnWidth(0) / 5;
-
-//    ui->tableWidget->setColumnWidth(0, column_width * 2);
-//    ui->tableWidget->setColumnWidth(1, column_width * 2);
-//    ui->tableWidget->setColumnWidth(1, column_width);
-    //ui->tableWidget->horizontalHeader()->setStretchLastSection(true);
+    ui->tableWidget->setColumnWidth(0, 450);
+    ui->tableWidget->setColumnWidth(1, 350);
 
     scanThread_ = new ScanThread(client_sock);
 
@@ -104,7 +102,6 @@ void MainWindow::btn_ap_clicked()
         }
 
         ap_btn_list[row]->setEnabled(1);
-
     }
     else
     {
@@ -249,13 +246,17 @@ void MainWindow::processCaptured(char* data)
         ap_map[info[2]].channel = info[3].toInt();
 
 
+
         ui->tableWidget->insertRow(row);
         QTableWidgetItem *item = new QTableWidgetItem(info[1]);
         item->setFlags(item->flags() & ~Qt::ItemIsEditable);
+        item->setTextAlignment(Qt::AlignCenter);
         ui->tableWidget->setItem(row, 0, item);
         QTableWidgetItem *item2 = new QTableWidgetItem(info[2]);
         item2->setFlags(item->flags() & ~Qt::ItemIsEditable);
+        item2->setTextAlignment(Qt::AlignCenter);
         ui->tableWidget->setItem(row, 1, item2);
+
 
         QPushButton * btn = new QPushButton(this);
 
@@ -264,10 +265,10 @@ void MainWindow::processCaptured(char* data)
         btn->setProperty("my_key", row);
         btn->setText("Attack");
         btn->setEnabled(1);
+        btn->setStyleSheet("QPushButton{font-size: 40px;font-family: Arial;background-color: white;}");
 
         QObject::connect(btn, &QPushButton::clicked, this, &MainWindow::btn_ap_clicked);
         ui->tableWidget->setCellWidget(row, 2, (QWidget*)btn);
-
     }
     else if (info[0] == "2")
     {
@@ -280,6 +281,7 @@ void MainWindow::processCaptured(char* data)
         ap_map[info[1]].station_map[info[2]] = info[3];
 
         int ap_row;
+
         for (int i=0; i<ui->tableWidget->rowCount(); i++)
         {
             if(ui->tableWidget->item(i, 1)->text() == info[1])
@@ -304,15 +306,21 @@ void MainWindow::on_tableWidget_cellDoubleClicked(int row, int column)
 
     for (auto it = ap_btn_list.begin(); it != ap_btn_list.end(); it++)
     {
-        (*it)->setStyleSheet("background-color: white");
+        (*it)->setStyleSheet("QPushButton{font-size: 40px;font-family: Arial;background-color: white;}");
     }
-    ap_btn_list[row]->setStyleSheet("background-color: cyan");
+
+    ap_btn_list[row]->setStyleSheet("QPushButton{font-size: 40px;font-family: Arial;background-color: cyan;}");;
 
 
 
     QStringList label = {"Mac address", "Signal", "Select"};
     ui->tableWidget_2->setRowCount(0);
     ui->tableWidget_2->setHorizontalHeaderLabels(label);
+
+    ui->tableWidget_2->setColumnWidth(0, 450);
+    ui->tableWidget_2->setColumnWidth(1, 350);
+
+
 
 
     QMapIterator<QString, QString> i(ap_map[selected_ap].station_map);
@@ -326,9 +334,11 @@ void MainWindow::on_tableWidget_cellDoubleClicked(int row, int column)
         ui->tableWidget_2->insertRow(row2);
         QTableWidgetItem *item = new QTableWidgetItem(i.key());
         item->setFlags(item->flags() & ~Qt::ItemIsEditable);
+        item->setTextAlignment(Qt::AlignCenter);
         ui->tableWidget_2->setItem(row2, 0, item);
         QTableWidgetItem *item2 = new QTableWidgetItem(i.value());
         item2->setFlags(item->flags() & ~Qt::ItemIsEditable);
+        item2->setTextAlignment(Qt::AlignCenter);
         ui->tableWidget_2->setItem(row2, 1, item2);
 
         QPushButton * btn = new QPushButton(this);
@@ -339,6 +349,8 @@ void MainWindow::on_tableWidget_cellDoubleClicked(int row, int column)
         btn->setProperty("my_key", row2);
         btn->setText("Attack");
         btn->setEnabled(1);
+        btn->setStyleSheet("QPushButton{font-size: 40px;font-family: Arial;background-color: white;}");
+
 
         QObject::connect(btn, &QPushButton::clicked, this, &MainWindow::btn_station_clicked);
         ui->tableWidget_2->setCellWidget(row2, 2, (QWidget*)btn);

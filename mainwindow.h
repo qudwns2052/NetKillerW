@@ -31,6 +31,7 @@ public:
     char data[BUF_SIZE];
     char buf[BUF_SIZE];
     QString selected_ap;
+
     QList<QPushButton *> ap_btn_list;
     QList<QPushButton *> station_btn_list;
 

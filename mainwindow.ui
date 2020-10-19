@@ -50,6 +50,12 @@
        </property>
        <item>
         <widget class="QTableWidget" name="tableWidget">
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
          <property name="cursor" stdset="0">
           <cursorShape>BlankCursor</cursorShape>
          </property>
@@ -57,10 +63,10 @@
           <bool>false</bool>
          </property>
          <property name="autoScrollMargin">
-          <number>16</number>
+          <number>0</number>
          </property>
          <property name="editTriggers">
-          <set>QAbstractItemView::DoubleClicked</set>
+          <set>QAbstractItemView::NoEditTriggers</set>
          </property>
          <property name="tabKeyNavigation">
           <bool>false</bool>
@@ -138,8 +144,11 @@
          <property name="autoScroll">
           <bool>false</bool>
          </property>
+         <property name="autoScrollMargin">
+          <number>0</number>
+         </property>
          <property name="editTriggers">
-          <set>QAbstractItemView::DoubleClicked</set>
+          <set>QAbstractItemView::NoEditTriggers</set>
          </property>
          <property name="tabKeyNavigation">
           <bool>false</bool>
