@@ -24,6 +24,10 @@ void ScanThread::run() {
     char data[BUF_SIZE] = {0};
     char buf[BUF_SIZE] = {0};
 
+    memset(buf, 0x00, BUF_SIZE);
+    memcpy(buf, "1", 1);
+    send_data(client_sock, buf);
+
     while (active_)
     {
         FD_ZERO(&readfds);
@@ -44,16 +48,10 @@ void ScanThread::run() {
     }
 
     memset(buf, 0x00, BUF_SIZE);
-    if(isAp)
-    {
-        memcpy(buf, "5", 1);
-    }
-    else
-    {
-        memcpy(buf, "6", 1);
-    }
+    memcpy(buf, "5", 1);
     send_data(client_sock, buf);
 
     close();
 
 }
+

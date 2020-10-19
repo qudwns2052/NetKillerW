@@ -8,9 +8,8 @@ struct ScanThread : QThread {
     Q_OBJECT
 
 public:
-    ScanThread(int sock, bool isAp) {
+    ScanThread(int sock) {
         client_sock = sock;
-        this->isAp = isAp;
     }
 
     ~ScanThread() override {
@@ -18,7 +17,6 @@ public:
 
     bool active_{false};
     int client_sock;
-    bool isAp;
 protected:
     bool open();
     bool close();
@@ -30,4 +28,5 @@ public:
 signals:
     void captured(char * data);
 };
+
 

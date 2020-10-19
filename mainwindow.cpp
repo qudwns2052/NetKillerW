@@ -8,21 +8,21 @@ MainWindow::MainWindow(QWidget *parent)
     , ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
-    ui->btn_all->setEnabled(0);
-    ui->btn_stop->setEnabled(0);
     QHeaderView *verticalHeader = ui->tableWidget->verticalHeader();
     QHeaderView *verticalHeader2 = ui->tableWidget_2->verticalHeader();
     //    verticalHeader->setSectionResizeMode(QHeaderView::Fixed);
     //    verticalHeader2->setSectionResizeMode(QHeaderView::Fixed);
 
 #ifdef Q_OS_ANDROID
-    verticalHeader->setDefaultSectionSize(100);
-    verticalHeader2->setDefaultSectionSize(100);
+    verticalHeader->setDefaultSectionSize(60);
+    verticalHeader2->setDefaultSectionSize(60);
 #endif
 
     ui->tableWidget->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
     ui->tableWidget_2->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
 
+    ui->tableWidget->verticalScrollBar()->setStyleSheet("QScrollBar:vertical { width: 70px; }");
+    ui->tableWidget_2->verticalScrollBar()->setStyleSheet("QScrollBar:vertical { width: 70px; }");
 
     // start Server
     {
@@ -46,6 +46,25 @@ MainWindow::MainWindow(QWidget *parent)
         printf("connection ok\n");
     }
 
+
+    QStringList label = {"SSID", "Mac address", "Select"};
+    ui->tableWidget->setRowCount(0);
+    ui->tableWidget->setHorizontalHeaderLabels(label);
+
+    ui->tableWidget->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
+
+//    int column_width = ui->tableWidget->columnWidth(0) / 5;
+
+//    ui->tableWidget->setColumnWidth(0, column_width * 2);
+//    ui->tableWidget->setColumnWidth(1, column_width * 2);
+//    ui->tableWidget->setColumnWidth(1, column_width);
+    //ui->tableWidget->horizontalHeader()->setStretchLastSection(true);
+
+    scanThread_ = new ScanThread(client_sock);
+
+    QObject::connect(scanThread_, &ScanThread::captured, this, &MainWindow::processCaptured);
+
+    scanThread_->start();
 }
 
 MainWindow::~MainWindow()
@@ -59,282 +78,271 @@ void MainWindow::btn_ap_clicked()
     QPushButton *pb = qobject_cast<QPushButton *>(QObject::sender());
     int row = pb->property("my_key").toInt();
 
-    if(ap_btn_list[row]->text() == "Stop")
+    if(ap_btn_list[row]->text() != "Stop")
     {
+        ap_btn_list[row]->setText("Stop");
+
         scanThread_->active_ = false;
         scanThread_->quit();
         scanThread_->wait();
         delete scanThread_;
 
-        for(auto it = station_btn_list.begin(); it != station_btn_list.end(); it++)
+        for(auto it = ap_btn_list.begin(); it != ap_btn_list.end(); it++)
         {
-            (*it)->setEnabled(1);
+            (*it)->setEnabled(0);
         }
 
-        ap_btn_list[row]->setText("Find");
+        for(auto it = station_btn_list.begin(); it != station_btn_list.end(); it++)
+        {
+            (*it)->setEnabled(0);
+        }
+
+        for (int i=0; i< ui->tableWidget_2->rowCount(); i++)
+        {
+            ui->tableWidget_2->item(i, 0)->setBackgroundColor(Qt::red);
+            ui->tableWidget_2->item(i, 1)->setBackgroundColor(Qt::red);
+        }
+
+        ap_btn_list[row]->setEnabled(1);
+
+    }
+    else
+    {
+        ap_btn_list[row]->setText("Attack");
+        scanThread_ = new ScanThread(client_sock);
+
+        QObject::connect(scanThread_, &ScanThread::captured, this, &MainWindow::processCaptured);
+
+        scanThread_->start();
 
         for(auto it = ap_btn_list.begin(); it != ap_btn_list.end(); it++)
         {
             (*it)->setEnabled(1);
         }
 
+        for(auto it = station_btn_list.begin(); it != station_btn_list.end(); it++)
+        {
+            (*it)->setEnabled(1);
+        }
 
-        ui->btn_all->setEnabled(1);
-        ui->btn_start->setEnabled(1);
+        for (int i=0; i< ui->tableWidget_2->rowCount(); i++)
+        {
+            ui->tableWidget_2->item(i, 0)->setBackgroundColor(Qt::white);
+            ui->tableWidget_2->item(i, 1)->setBackgroundColor(Qt::white);
+        }
 
-        return;
+        usleep(500000);
     }
-
-    for(auto it = ap_btn_list.begin(); it != ap_btn_list.end(); it++)
-    {
-        (*it)->setEnabled(0);
-    }
-
-    ap_btn_list[row]->setText("Stop");
-    ap_btn_list[row]->setEnabled(1);
-
-    station_map.clear();
-    station_btn_list.clear();
-
-    QStringList label = {"Mac address", "Signal", "Select"};
-
-    ui->tableWidget_2->setRowCount(0);
-
-    ui->tableWidget_2->setHorizontalHeaderLabels(label);
-
-    scanThread_ = new ScanThread(client_sock, false);
-
-    QObject::connect(scanThread_, &ScanThread::captured, this, &MainWindow::processCaptured);
-
 
     memset(buf, 0x00, BUF_SIZE);
-    memcpy(buf, "2", 1);
+    memcpy(buf, "3", 1);
     send_data(client_sock, buf);
 
     memset(data, 0x00, BUF_SIZE);
-    strcpy(data, ui->tableWidget->item(row, 1)->text().toStdString().c_str());
+    QString temp = ui->tableWidget->item(row, 1)->text() + "\t" + "FF:FF:FF:FF:FF:FF";
+    strcpy(data, temp.toStdString().c_str());
     send_data(client_sock, data);
-    scanThread_->start();
 
-    ui->btn_start->setEnabled(0);
+
 }
 void MainWindow::btn_station_clicked()
 {
     QPushButton *pb = qobject_cast<QPushButton *>(QObject::sender());
     int row = pb->property("my_key").toInt();
 
-    QMessageBox MsgBox;
-    MsgBox.setWindowTitle("deauth Attack start !!!");
-    MsgBox.setText(ui->tableWidget_2->item(row, 0)->text());
-    MsgBox.setStandardButtons(QMessageBox::Ok);
-    MsgBox.setDefaultButton(QMessageBox::Ok);
+    QString selected_ap;
 
-
-    if ( MsgBox.exec() != QMessageBox::Ok )
+    for (auto it = ap_map.begin(); it != ap_map.end(); it++)
     {
-        printf("Msg error\n");
-        exit(1);
+        for (auto i = it->station_map.begin(); i != it->station_map.end(); i++)
+        {
+            if (i.key() == ui->tableWidget_2->item(row, 0)->text())
+            {
+                selected_ap = it.key();
+                break;
+            }
+        }
+    }
+
+    if(station_btn_list[row]->text() != "Stop")
+    {
+        station_btn_list[row]->setText("Stop");
+
+        if (scanThread_->active_)
+        {
+            scanThread_->active_ = false;
+            scanThread_->quit();
+            scanThread_->wait();
+            delete scanThread_;
+
+            for(auto it = ap_btn_list.begin(); it != ap_btn_list.end(); it++)
+            {
+                //                if(ui->tableWidget->item((*it)->property("my_key").toInt(), 1)->text() != selected_ap)
+                (*it)->setEnabled(0);
+            }
+        }
+
+        ui->tableWidget_2->item(row, 0)->setBackgroundColor(Qt::red);
+        ui->tableWidget_2->item(row, 1)->setBackgroundColor(Qt::red);
+    }
+    else
+    {
+        station_btn_list[row]->setText("Attack");
+        station_btn_list[row]->setEnabled(1);
+
+        bool isAttack = false;
+        for(auto it = station_btn_list.begin(); it != station_btn_list.end(); it++)
+        {
+            if ((*it)->text() == "Stop")
+            {
+                isAttack = true;
+                break;
+            }
+        }
+        if(!isAttack)
+        {
+            scanThread_ = new ScanThread(client_sock);
+
+            QObject::connect(scanThread_, &ScanThread::captured, this, &MainWindow::processCaptured);
+
+            scanThread_->start();
+
+            for(auto it = ap_btn_list.begin(); it != ap_btn_list.end(); it++)
+            {
+                (*it)->setEnabled(1);
+            }
+
+            usleep(500000);
+        }
+
+        ui->tableWidget_2->item(row, 0)->setBackgroundColor(Qt::white);
+        ui->tableWidget_2->item(row, 1)->setBackgroundColor(Qt::white);
     }
 
     memset(buf, 0x00, BUF_SIZE);
-
     memcpy(buf, "3", 1);
-    if (write(client_sock, buf, 1) <= 0)
-    {
-        printf("write error\n");
-        exit(1);
-    }
-
-
-    memset(data, 0x00, BUF_SIZE);
-    strcpy(data, ui->tableWidget_2->item(row, 0)->text().toStdString().c_str());
-
-    if (write(client_sock, data, strlen(data)) <= 0)
-    {
-        printf("write error\n");
-        exit(1);
-    }
-
-
-}
-void MainWindow::on_btn_all_clicked()
-{
-    QMessageBox MsgBox;
-    MsgBox.setWindowTitle("All deauth Attack start !!!");
-    MsgBox.setText("FF:FF:FF:FF:FF:FF");
-    MsgBox.setStandardButtons(QMessageBox::Ok);
-    MsgBox.setDefaultButton(QMessageBox::Ok);
-
-    if ( MsgBox.exec() != QMessageBox::Ok )
-    {
-        printf("Msg error\n");
-        exit(1);
-    }
-
-    memset(buf, 0x00, BUF_SIZE);
-
-    memcpy(buf, "4", 1);
-    if (write(client_sock, buf, 1) <= 0)
-    {
-        printf("write error\n");
-        exit(1);
-    }
-
-}
-
-
-void MainWindow::on_btn_start_clicked()
-{
-    ap_map.clear();
-    ap_btn_list.clear();
-
-    QStringList label = {"SSID", "Mac address", "Select"};
-    ui->tableWidget->setRowCount(0);
-    ui->tableWidget->setHorizontalHeaderLabels(label);
-
-    QStringList label2 = {"Mac address", "Signal", "Select"};
-    ui->tableWidget_2->setRowCount(0);
-    ui->tableWidget_2->setHorizontalHeaderLabels(label);
-
-    scanThread_ = new ScanThread(client_sock, true);
-
-    QObject::connect(scanThread_, &ScanThread::captured, this, &MainWindow::processCaptured);
-
-
-    memset(buf, 0x00, BUF_SIZE);
-    memcpy(buf, "1", 1);
     send_data(client_sock, buf);
 
-    scanThread_->start();
-
-    ui->btn_start->setEnabled(0);
-    ui->btn_stop->setEnabled(1);
-}
-
-void MainWindow::on_btn_stop_clicked()
-{
-    scanThread_->active_ = false;
-    scanThread_->quit();
-    scanThread_->wait();
-    delete scanThread_;
-
-    for(auto it = ap_btn_list.begin(); it != ap_btn_list.end(); it++)
-    {
-        (*it)->setEnabled(1);
-    }
-
-    ui->btn_start->setEnabled(1);
-    ui->btn_stop->setEnabled(0);
+    memset(data, 0x00, BUF_SIZE);
+    QString temp = selected_ap + "\t" + ui->tableWidget_2->item(row, 0)->text();
+    strcpy(data, temp.toStdString().c_str());
+    send_data(client_sock, data);
 
 }
 
 void MainWindow::processCaptured(char* data)
 {
-    if(scanThread_->isAp)
+
+    QString temp = QString(data);
+    QStringList info = temp.split("\t");
+
+    if(info[0] == "1") // if ap info
     {
-        QString temp = QString(data);
-
-        QStringList info = temp.split("\t");
-
-
-        if (ap_map.find(info[1]) != ap_map.end())
+        int row = ui->tableWidget->rowCount();
+        if (ap_map.find(info[2]) != ap_map.end())
         {
             return;
         }
 
-        ap_map[info[1]] = info[0];
+        // 1\tgoka_5g\t12:34:56\tchannel
 
-        int row = ui->tableWidget->rowCount();
+        ap_map[info[2]].channel = info[3].toInt();
+
 
         ui->tableWidget->insertRow(row);
-        ui->tableWidget->setItem(row, 0, new QTableWidgetItem(info[0]));
-        ui->tableWidget->setItem(row, 1, new QTableWidgetItem(info[1]));
+        QTableWidgetItem *item = new QTableWidgetItem(info[1]);
+        item->setFlags(item->flags() & ~Qt::ItemIsEditable);
+        ui->tableWidget->setItem(row, 0, item);
+        QTableWidgetItem *item2 = new QTableWidgetItem(info[2]);
+        item2->setFlags(item->flags() & ~Qt::ItemIsEditable);
+        ui->tableWidget->setItem(row, 1, item2);
 
         QPushButton * btn = new QPushButton(this);
 
         ap_btn_list.append(btn);
 
         btn->setProperty("my_key", row);
-        btn->setText("Find");
-        btn->setEnabled(0);
+        btn->setText("Attack");
+        btn->setEnabled(1);
 
         QObject::connect(btn, &QPushButton::clicked, this, &MainWindow::btn_ap_clicked);
         ui->tableWidget->setCellWidget(row, 2, (QWidget*)btn);
+
     }
-
-
-    else
+    else if (info[0] == "2")
     {
-        QString temp = QString(data);
-        QStringList info = temp.split("\t");
-
-        int row = ui->tableWidget_2->rowCount();
-        if (station_map.find(info[0]) != station_map.end())
+        if(ap_map[info[1]].station_map.find(info[2]) != ap_map[info[1]].station_map.end())
         {
             return;
         }
 
-        station_map[info[0]] = info[1];
+        // 2\tAPmac\tStationMAC\t-58
+        ap_map[info[1]].station_map[info[2]] = info[3];
 
-        ui->tableWidget_2->insertRow(row);
-        ui->tableWidget_2->setItem(row, 0, new QTableWidgetItem(info[0]));
-        ui->tableWidget_2->setItem(row, 1, new QTableWidgetItem(info[1]));
+        int ap_row;
+        for (int i=0; i<ui->tableWidget->rowCount(); i++)
+        {
+            if(ui->tableWidget->item(i, 1)->text() == info[1])
+            {
+                ap_row = i;
+                break;
+            }
+        }
+
+        ui->tableWidget->item(ap_row, 0)->setBackgroundColor(Qt::green);
+        ui->tableWidget->item(ap_row, 1)->setBackgroundColor(Qt::green);
+
+    }
+}
+
+void MainWindow::on_tableWidget_cellDoubleClicked(int row, int column)
+{
+
+    station_btn_list.clear();
+
+    selected_ap = ui->tableWidget->item(row, 1)->text();
+
+    for (auto it = ap_btn_list.begin(); it != ap_btn_list.end(); it++)
+    {
+        (*it)->setStyleSheet("background-color: white");
+    }
+    ap_btn_list[row]->setStyleSheet("background-color: cyan");
+
+
+
+    QStringList label = {"Mac address", "Signal", "Select"};
+    ui->tableWidget_2->setRowCount(0);
+    ui->tableWidget_2->setHorizontalHeaderLabels(label);
+
+
+    QMapIterator<QString, QString> i(ap_map[selected_ap].station_map);
+
+    int row2;
+
+    while (i.hasNext()) {
+        i.next();
+        row2 = ui->tableWidget_2->rowCount();
+
+        ui->tableWidget_2->insertRow(row2);
+        QTableWidgetItem *item = new QTableWidgetItem(i.key());
+        item->setFlags(item->flags() & ~Qt::ItemIsEditable);
+        ui->tableWidget_2->setItem(row2, 0, item);
+        QTableWidgetItem *item2 = new QTableWidgetItem(i.value());
+        item2->setFlags(item->flags() & ~Qt::ItemIsEditable);
+        ui->tableWidget_2->setItem(row2, 1, item2);
 
         QPushButton * btn = new QPushButton(this);
 
         station_btn_list.append(btn);
 
-        btn->setProperty("my_key", row);
+
+        btn->setProperty("my_key", row2);
         btn->setText("Attack");
-        btn->setEnabled(0);
+        btn->setEnabled(1);
 
         QObject::connect(btn, &QPushButton::clicked, this, &MainWindow::btn_station_clicked);
-        ui->tableWidget_2->setCellWidget(row,2,(QWidget*)btn);
-
+        ui->tableWidget_2->setCellWidget(row2, 2, (QWidget*)btn);
     }
+
+
 }
-//        char * ptr;
-//        int i=0;
-
-//        if(strlen(data) != 0)
-//        {
-//            MsgBox.setWindowTitle("Success Get Client info !");
-//            ptr = strtok(data, ",");
-//            while (ptr != NULL)
-//            {
-//                QString temp = QString(ptr);
-//                QStringList list = temp.split("\t");
-
-//                ui->tableWidget_2->insertRow(ui->tableWidget_2->rowCount());
-//                ui->tableWidget_2->setItem(i, 0, new QTableWidgetItem(list[0]));
-//                ui->tableWidget_2->setItem(i, 1, new QTableWidgetItem(list[1]));
-
-//                QPushButton * btn = new QPushButton(this);
-
-//                btn->setProperty("my_key", i);
-//                btn->setText("Attack");
-
-//                QObject::connect(btn, &QPushButton::clicked, this, &MainWindow::btn_station_clicked);
-//                ui->tableWidget_2->setCellWidget(i,2,(QWidget*)btn);
-
-//                ptr = strtok(NULL, ",");
-//                i++;
-//            }
-//        }
-//        else
-//        {
-//            MsgBox.setWindowTitle("Failed Get Client info ...");
-//        }
-
-//        MsgBox.setStandardButtons(QMessageBox::Ok);
-//        MsgBox.setDefaultButton(QMessageBox::Ok);
-
-//        if ( MsgBox.exec() != QMessageBox::Ok )
-//        {
-//            printf("Msg error\n");
-//            exit(1);
-//        }
-
-//    }
-
-
