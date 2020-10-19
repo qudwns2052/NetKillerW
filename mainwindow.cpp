@@ -14,8 +14,8 @@ MainWindow::MainWindow(QWidget *parent)
     //    verticalHeader2->setSectionResizeMode(QHeaderView::Fixed);
 
 #ifdef Q_OS_ANDROID
-    verticalHeader->setDefaultSectionSize(60);
-    verticalHeader2->setDefaultSectionSize(60);
+    verticalHeader->setDefaultSectionSize(80);
+    verticalHeader2->setDefaultSectionSize(80);
 #endif
 
     ui->tableWidget->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
