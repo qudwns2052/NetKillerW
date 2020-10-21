@@ -1,7 +1,18 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
 #include "thread.h"
-#include <QMessageBox>
+#include <QFontDatabase>
+
+class MyScrollBar : public QScrollBar
+{
+public:
+    MyScrollBar(QWidget * parent): QScrollBar(parent) {}
+
+protected:
+    QSize sizeHint() const override { return QSize(64, 0); }
+    QSize minimumSizeHint() const override { return QSize(64, 0); }
+};
+
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
@@ -10,22 +21,35 @@ MainWindow::MainWindow(QWidget *parent)
     ui->setupUi(this);
     QHeaderView *verticalHeader = ui->tableWidget->verticalHeader();
     QHeaderView *verticalHeader2 = ui->tableWidget_2->verticalHeader();
-    //    verticalHeader->setSectionResizeMode(QHeaderView::Fixed);
-    //    verticalHeader2->setSectionResizeMode(QHeaderView::Fixed);
 
 #ifdef Q_OS_ANDROID
     verticalHeader->setDefaultSectionSize(80);
     verticalHeader2->setDefaultSectionSize(80);
 #endif
 
-//    ui->tableWidget->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
-//    ui->tableWidget_2->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
+    ui->tableWidget->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOn); // Always show scroll bar
+    ui->tableWidget->setEditTriggers(QAbstractItemView::NoEditTriggers); // Disable editing
 
-    ui->tableWidget->horizontalHeader()->setStretchLastSection(true);
-    ui->tableWidget_2->horizontalHeader()->setStretchLastSection(true);
+    ui->tableWidget_2->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOn); // Always show scroll bar
+    ui->tableWidget_2->setEditTriggers(QAbstractItemView::NoEditTriggers); // Disable editing
 
-    ui->tableWidget->verticalScrollBar()->setStyleSheet("QScrollBar:vertical { width: 70px; }");
-    ui->tableWidget_2->verticalScrollBar()->setStyleSheet("QScrollBar:vertical { width: 70px; }");
+    QHeaderView* hw = ui->tableWidget->horizontalHeader();
+    QHeaderView* hw2 = ui->tableWidget_2->horizontalHeader();
+    hw->setSectionResizeMode(0, QHeaderView::Stretch); // Set SSID size policy
+    hw->setSectionResizeMode(1, QHeaderView::Fixed); // Set MAC size policy
+    hw->setSectionResizeMode(2, QHeaderView::Fixed); // Set SELECT size policy
+    hw2->setSectionResizeMode(0, QHeaderView::Stretch); // Set SSID size policy
+    hw2->setSectionResizeMode(1, QHeaderView::Fixed); // Set MAC size policy
+    hw2->setSectionResizeMode(2, QHeaderView::Fixed); // Set SELECT size policy
+
+    const QFont fixedFont = QFontDatabase::systemFont(QFontDatabase::FixedFont); // Use system fixed width font
+    ui->tableWidget->setFont(fixedFont);
+    ui->tableWidget_2->setFont(fixedFont);
+
+#ifdef Q_OS_ANDROID
+    ui->tableWidget->setVerticalScrollBar(new MyScrollBar(ui->tableWidget->verticalScrollBar())); // Big scroll bar
+    ui->tableWidget_2->setVerticalScrollBar(new MyScrollBar(ui->tableWidget->verticalScrollBar())); // Big scroll bar
+#endif // Q_OS_ANDROID
 
 
     // start Server
@@ -55,8 +79,18 @@ MainWindow::MainWindow(QWidget *parent)
     ui->tableWidget->setRowCount(0);
     ui->tableWidget->setHorizontalHeaderLabels(label);
 
-    ui->tableWidget->setColumnWidth(0, 450);
     ui->tableWidget->setColumnWidth(1, 350);
+    ui->tableWidget->setColumnWidth(2, 150);
+
+    QStringList label2 = {"Mac address", "Signal", "Select"};
+    ui->tableWidget_2->setRowCount(0);
+    ui->tableWidget_2->setHorizontalHeaderLabels(label2);
+
+    ui->tableWidget_2->setColumnWidth(1, 350);
+    ui->tableWidget_2->setColumnWidth(2, 150);
+
+
+
 
     scanThread_ = new ScanThread(client_sock);
 
@@ -313,14 +347,7 @@ void MainWindow::on_tableWidget_cellDoubleClicked(int row, int column)
 
 
 
-    QStringList label = {"Mac address", "Signal", "Select"};
     ui->tableWidget_2->setRowCount(0);
-    ui->tableWidget_2->setHorizontalHeaderLabels(label);
-
-    ui->tableWidget_2->setColumnWidth(0, 450);
-    ui->tableWidget_2->setColumnWidth(1, 350);
-
-
 
 
     QMapIterator<QString, QString> i(ap_map[selected_ap].station_map);
