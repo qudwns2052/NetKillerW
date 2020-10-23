@@ -267,6 +267,24 @@ void MainWindow::processCaptured(char* data)
     QString temp = QString(data);
     QStringList info = temp.split("\t");
 
+    if(info.length() != 4)
+    {
+        return;
+    }
+
+//    int row2 = ui->tableWidget_2->rowCount();
+
+//    QString length = QString::number(info.length());
+
+//    ui->tableWidget_2->insertRow(row2);
+//    QTableWidgetItem *item = new QTableWidgetItem(length);
+//    item->setFlags(item->flags() & ~Qt::ItemIsEditable);
+//    item->setTextAlignment(Qt::AlignCenter);
+//    ui->tableWidget_2->setItem(row2, 0, item);
+
+//    return;
+
+
     if(info[0] == "1") // if ap info
     {
         int row = ui->tableWidget->rowCount();
