@@ -56,7 +56,7 @@ MainWindow::MainWindow(QWidget *parent)
     {
         system("export LD_PRELOAD=/system/lib/libfakeioctl.so");
         system("su -c \"nexutil -m2\"");
-        system("su -c \"/data/local/tmp/gilgil/deauthServer&\"");
+        system("su -c \"/data/local/tmp/deauthServer&\"");
         sleep(1);
     }
 
@@ -329,10 +329,7 @@ void MainWindow::processCaptured(char* data)
             return;
         }
 
-        // 2\tAPmac\tStationMAC\t-58
-        ap_map[info[1]].station_map[info[2]] = info[3];
-
-        int ap_row;
+        int ap_row = -1;
 
         for (int i=0; i<ui->tableWidget->rowCount(); i++)
         {
@@ -342,6 +339,14 @@ void MainWindow::processCaptured(char* data)
                 break;
             }
         }
+
+        if(ap_row == -1)
+        {
+            return;
+        }
+
+        ap_map[info[1]].station_map[info[2]] = info[3];
+        // 2\tAPmac\tStationMAC\t-58
 
         ui->tableWidget->item(ap_row, 0)->setBackgroundColor(Qt::green);
         ui->tableWidget->item(ap_row, 1)->setBackgroundColor(Qt::green);
