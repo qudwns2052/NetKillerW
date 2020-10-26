@@ -24,7 +24,9 @@ MainWindow::MainWindow(QWidget *parent)
 
 #ifdef Q_OS_ANDROID
     verticalHeader->setDefaultSectionSize(80);
+    verticalHeader->setVisible(false);
     verticalHeader2->setDefaultSectionSize(80);
+    verticalHeader2->setVisible(false);
 #endif
 
     ui->tableWidget->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOn); // Always show scroll bar
@@ -71,23 +73,24 @@ MainWindow::MainWindow(QWidget *parent)
             exit(1);
         }
 
-        printf("connection ok\n");
+        printf("connection "
+               "ok\n");
     }
 
 
-    QStringList label = {"SSID", "Mac address", "Select"};
+    QStringList label = {"SSID", "Mac", ""};
     ui->tableWidget->setRowCount(0);
     ui->tableWidget->setHorizontalHeaderLabels(label);
 
     ui->tableWidget->setColumnWidth(1, 350);
-    ui->tableWidget->setColumnWidth(2, 150);
+    ui->tableWidget->setColumnWidth(2, 80);
 
-    QStringList label2 = {"Mac address", "Signal", "Select"};
+    QStringList label2 = {"Mac", "Signal", ""};
     ui->tableWidget_2->setRowCount(0);
     ui->tableWidget_2->setHorizontalHeaderLabels(label2);
 
     ui->tableWidget_2->setColumnWidth(1, 350);
-    ui->tableWidget_2->setColumnWidth(2, 150);
+    ui->tableWidget_2->setColumnWidth(2, 80);
 
 
 
@@ -382,7 +385,7 @@ void MainWindow::on_tableWidget_cellDoubleClicked(int row, int column)
         (*it)->setStyleSheet("QPushButton{font-size: 40px;font-family: Arial;background-color: white;}");
     }
 
-    ap_btn_list[row]->setStyleSheet("QPushButton{font-size: 40px;font-family: Arial;background-color: cyan;}");;
+    ap_btn_list[row]->setStyleSheet("QPushButton{font-size: 40px;font-family: Arial;background-color: magenta;}");;
 
 
 

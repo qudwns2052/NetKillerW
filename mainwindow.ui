@@ -114,7 +114,7 @@
          </column>
          <column>
           <property name="text">
-           <string>Mac address</string>
+           <string>Mac</string>
           </property>
           <property name="font">
            <font>
@@ -125,7 +125,7 @@
          </column>
          <column>
           <property name="text">
-           <string>Select</string>
+           <string/>
           </property>
           <property name="font">
            <font>
@@ -170,7 +170,7 @@
          </property>
          <column>
           <property name="text">
-           <string>Mac address</string>
+           <string>Mac</string>
           </property>
           <property name="font">
            <font>
@@ -192,7 +192,7 @@
          </column>
          <column>
           <property name="text">
-           <string>Select</string>
+           <string/>
           </property>
           <property name="font">
            <font>
