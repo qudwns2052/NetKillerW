@@ -110,9 +110,14 @@ void MainWindow::btn_ap_clicked()
     QPushButton *pb = qobject_cast<QPushButton *>(QObject::sender());
     int row = pb->property("my_key").toInt();
 
-    if(ap_btn_list[row]->text() != "Stop")
+//    if(ap_btn_list[row]->text() != "Stop")
+//    {
+    if(ap_btn_list[row]->property("state").toInt() == 0)
     {
-        ap_btn_list[row]->setText("Stop");
+        ap_btn_list[row]->setIcon(QIcon(":/images/stop.png"));
+        ap_btn_list[row]->setProperty("state", 1);
+
+//        ap_btn_list[row]->setText("Stop");
 
         scanThread_->active_ = false;
         scanThread_->quit();
@@ -139,7 +144,10 @@ void MainWindow::btn_ap_clicked()
     }
     else
     {
-        ap_btn_list[row]->setText("Attack");
+        ap_btn_list[row]->setIcon(QIcon(":/images/start.png"));
+        ap_btn_list[row]->setProperty("state", 0);
+
+
         scanThread_ = new ScanThread(client_sock);
 
         QObject::connect(scanThread_, &ScanThread::captured, this, &MainWindow::processCaptured);
@@ -195,9 +203,11 @@ void MainWindow::btn_station_clicked()
         }
     }
 
-    if(station_btn_list[row]->text() != "Stop")
+//    if(station_btn_list[row]->text() != "Stop")
+    if(station_btn_list[row]->property("state").toInt() == 0)
     {
-        station_btn_list[row]->setText("Stop");
+        station_btn_list[row]->setIcon(QIcon(":/images/stop.png"));
+        station_btn_list[row]->setProperty("state", 1);
 
         if (scanThread_->active_)
         {
@@ -218,13 +228,15 @@ void MainWindow::btn_station_clicked()
     }
     else
     {
-        station_btn_list[row]->setText("Attack");
+        station_btn_list[row]->setIcon(QIcon(":/images/start.png"));
+        station_btn_list[row]->setProperty("state", 0);
         station_btn_list[row]->setEnabled(1);
 
         bool isAttack = false;
         for(auto it = station_btn_list.begin(); it != station_btn_list.end(); it++)
         {
-            if ((*it)->text() == "Stop")
+//            if ((*it)->text() == "Stop")
+            if ((*it)->property("state").toInt() == 1)
             {
                 isAttack = true;
                 break;
@@ -315,9 +327,13 @@ void MainWindow::processCaptured(char* data)
         ap_btn_list.append(btn);
 
         btn->setProperty("my_key", row);
-        btn->setText("Attack");
         btn->setEnabled(1);
-        btn->setStyleSheet("QPushButton{font-size: 40px;font-family: Arial;background-color: white;}");
+        btn->setIcon(QIcon(":/images/start.png"));
+        btn->setIconSize(QSize(70,70));
+        btn->setProperty("state", 0);
+
+//        btn->setText("Attack");
+//        btn->setStyleSheet("QPushButton{font-size: 40px;font-family: Arial;background-color: white;}");
 
         QObject::connect(btn, &QPushButton::clicked, this, &MainWindow::btn_ap_clicked);
         ui->tableWidget->setCellWidget(row, 2, (QWidget*)btn);
@@ -397,9 +413,12 @@ void MainWindow::on_tableWidget_cellDoubleClicked(int row, int column)
 
 
         btn->setProperty("my_key", row2);
-        btn->setText("Attack");
+        btn->setIcon(QIcon(":/images/start.png"));
+        btn->setIconSize(QSize(70,70));
         btn->setEnabled(1);
-        btn->setStyleSheet("QPushButton{font-size: 40px;font-family: Arial;background-color: white;}");
+
+//        btn->setText("Attack");
+//        btn->setStyleSheet("QPushButton{font-size: 40px;font-family: Arial;background-color: white;}");
 
 
         QObject::connect(btn, &QPushButton::clicked, this, &MainWindow::btn_station_clicked);
