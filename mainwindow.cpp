@@ -1,7 +1,6 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
 #include "thread.h"
-#include <QFontDatabase>
 
 class MyScrollBar : public QScrollBar
 {
@@ -19,6 +18,11 @@ MainWindow::MainWindow(QWidget *parent)
     , ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
+
+//    QSplitter *splitter = new QSplitter(this);
+//    splitter->addWidget(ui->tableWidget);
+//    splitter->addWidget(ui->tableWidget_2);
+
     QHeaderView *verticalHeader = ui->tableWidget->verticalHeader();
     QHeaderView *verticalHeader2 = ui->tableWidget_2->verticalHeader();
 
