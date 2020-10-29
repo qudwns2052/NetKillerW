@@ -19,10 +19,6 @@ MainWindow::MainWindow(QWidget *parent)
 {
     ui->setupUi(this);
 
-//    QSplitter *splitter = new QSplitter(this);
-//    splitter->addWidget(ui->tableWidget);
-//    splitter->addWidget(ui->tableWidget_2);
-
     QHeaderView *verticalHeader = ui->tableWidget->verticalHeader();
     QHeaderView *verticalHeader2 = ui->tableWidget_2->verticalHeader();
 
@@ -44,9 +40,9 @@ MainWindow::MainWindow(QWidget *parent)
     hw->setSectionResizeMode(0, QHeaderView::Stretch); // Set SSID size policy
     hw->setSectionResizeMode(1, QHeaderView::Fixed); // Set MAC size policy
     hw->setSectionResizeMode(2, QHeaderView::Fixed); // Set SELECT size policy
-    hw2->setSectionResizeMode(0, QHeaderView::Stretch); // Set SSID size policy
-    hw2->setSectionResizeMode(1, QHeaderView::Fixed); // Set MAC size policy
-    hw2->setSectionResizeMode(2, QHeaderView::Fixed); // Set SELECT size policy
+    hw2->setSectionResizeMode(0, QHeaderView::Stretch); //
+    hw2->setSectionResizeMode(1, QHeaderView::Fixed); //
+    hw2->setSectionResizeMode(2, QHeaderView::Fixed); //
 
     const QFont fixedFont = QFontDatabase::systemFont(QFontDatabase::FixedFont); // Use system fixed width font
     ui->tableWidget->setFont(fixedFont);
@@ -54,13 +50,14 @@ MainWindow::MainWindow(QWidget *parent)
 
 #ifdef Q_OS_ANDROID
     ui->tableWidget->setVerticalScrollBar(new MyScrollBar(ui->tableWidget->verticalScrollBar())); // Big scroll bar
-    ui->tableWidget_2->setVerticalScrollBar(new MyScrollBar(ui->tableWidget->verticalScrollBar())); // Big scroll bar
+    ui->tableWidget_2->setVerticalScrollBar(new MyScrollBar(ui->tableWidget_2->verticalScrollBar())); // Big scroll bar
 #endif // Q_OS_ANDROID
 
 
     // start Server
     {
         system("export LD_PRELOAD=/system/lib/libfakeioctl.so");
+        system("su -c \"ifconfig wlan0 up\"");
         system("su -c \"nexutil -m2\"");
         system("su -c \"/data/local/tmp/deauthServer&\"");
         sleep(1);
@@ -76,9 +73,6 @@ MainWindow::MainWindow(QWidget *parent)
             printf("connection error\n");
             exit(1);
         }
-
-        printf("connection "
-               "ok\n");
     }
 
 
@@ -87,7 +81,7 @@ MainWindow::MainWindow(QWidget *parent)
     ui->tableWidget->setHorizontalHeaderLabels(label);
 
     ui->tableWidget->setColumnWidth(1, 350);
-    ui->tableWidget->setColumnWidth(2, 80);
+    ui->tableWidget->setColumnWidth(2, 100);
 
     QStringList label2 = {"Mac", "Signal", ""};
     ui->tableWidget_2->setRowCount(0);
@@ -117,8 +111,6 @@ void MainWindow::btn_ap_clicked()
     QPushButton *pb = qobject_cast<QPushButton *>(QObject::sender());
     int row = pb->property("my_key").toInt();
 
-//    if(ap_btn_list[row]->text() != "Stop")
-//    {
     if(ap_btn_list[row]->property("state").toInt() == 0)
     {
         ap_btn_list[row]->setIcon(QIcon(":/images/stop.png"));
@@ -291,18 +283,6 @@ void MainWindow::processCaptured(char* data)
         return;
     }
 
-//    int row2 = ui->tableWidget_2->rowCount();
-
-//    QString length = QString::number(info.length());
-
-//    ui->tableWidget_2->insertRow(row2);
-//    QTableWidgetItem *item = new QTableWidgetItem(length);
-//    item->setFlags(item->flags() & ~Qt::ItemIsEditable);
-//    item->setTextAlignment(Qt::AlignCenter);
-//    ui->tableWidget_2->setItem(row2, 0, item);
-
-//    return;
-
 
     if(info[0] == "1") // if ap info
     {
@@ -336,11 +316,8 @@ void MainWindow::processCaptured(char* data)
         btn->setProperty("my_key", row);
         btn->setEnabled(1);
         btn->setIcon(QIcon(":/images/start.png"));
-        btn->setIconSize(QSize(70,70));
+        btn->setIconSize(QSize(60,60));
         btn->setProperty("state", 0);
-
-//        btn->setText("Attack");
-//        btn->setStyleSheet("QPushButton{font-size: 40px;font-family: Arial;background-color: white;}");
 
         QObject::connect(btn, &QPushButton::clicked, this, &MainWindow::btn_ap_clicked);
         ui->tableWidget->setCellWidget(row, 2, (QWidget*)btn);
@@ -420,12 +397,9 @@ void MainWindow::on_tableWidget_cellDoubleClicked(int row, int column)
 
 
         btn->setProperty("my_key", row2);
-        btn->setIcon(QIcon(":/images/start.png"));
-        btn->setIconSize(QSize(70,70));
         btn->setEnabled(1);
-
-//        btn->setText("Attack");
-//        btn->setStyleSheet("QPushButton{font-size: 40px;font-family: Arial;background-color: white;}");
+        btn->setIcon(QIcon(":/images/start.png"));
+        btn->setIconSize(QSize(60,60));
 
 
         QObject::connect(btn, &QPushButton::clicked, this, &MainWindow::btn_station_clicked);
