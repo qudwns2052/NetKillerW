@@ -143,8 +143,8 @@ void MainWindow::btn_ap_clicked()
 
         for (int i=0; i< ui->tableWidget_2->rowCount(); i++)
         {
-            ui->tableWidget_2->item(i, 0)->setBackgroundColor(Qt::red);
-            ui->tableWidget_2->item(i, 1)->setBackgroundColor(Qt::red);
+            ui->tableWidget_2->item(i, 0)->setBackgroundColor(Qt::darkGray);
+            ui->tableWidget_2->item(i, 1)->setBackgroundColor(Qt::darkGray);
         }
 
         ap_btn_list[row]->setEnabled(1);
@@ -230,8 +230,8 @@ void MainWindow::btn_station_clicked()
             }
         }
 
-        ui->tableWidget_2->item(row, 0)->setBackgroundColor(Qt::red);
-        ui->tableWidget_2->item(row, 1)->setBackgroundColor(Qt::red);
+        ui->tableWidget_2->item(row, 0)->setBackgroundColor(Qt::darkGray);
+        ui->tableWidget_2->item(row, 1)->setBackgroundColor(Qt::darkGray);
     }
     else
     {
@@ -371,8 +371,8 @@ void MainWindow::processCaptured(char* data)
         ap_map[info[1]].station_map[info[2]] = info[3];
         // 2\tAPmac\tStationMAC\t-58
 
-        ui->tableWidget->item(ap_row, 0)->setBackgroundColor(Qt::green);
-        ui->tableWidget->item(ap_row, 1)->setBackgroundColor(Qt::green);
+        ui->tableWidget->item(ap_row, 0)->setBackgroundColor(Qt::gray);
+        ui->tableWidget->item(ap_row, 1)->setBackgroundColor(Qt::gray);
 
     }
 }
@@ -389,7 +389,7 @@ void MainWindow::on_tableWidget_cellDoubleClicked(int row, int column)
         (*it)->setStyleSheet("QPushButton{font-size: 40px;font-family: Arial;background-color: white;}");
     }
 
-    ap_btn_list[row]->setStyleSheet("QPushButton{font-size: 40px;font-family: Arial;background-color: magenta;}");;
+    ap_btn_list[row]->setStyleSheet("QPushButton{font-size: 40px;font-family: Arial;background-color: darkGray;}");;
 
 
 
