@@ -51,28 +51,23 @@ bool recv_data(int client_sock, char *data)
     size_t temp_length = 2;
     int read_size;
 
-//    while (temp_length > 0)
-//    {
-//        memset(buf, 0x00, BUF_SIZE);
-//        if ((read_size = read(client_sock, buf, temp_length)) < 0)
-//        {
-//            return false;
-//        }
 
-//        temp_length -= read_size;
-
-//        strcat(buf_data, (char*)buf);
-//    }
-
-//    data_length = (buf_data[0] << 8) + buf_data[1];
-
-    if (read(client_sock, buf, 2) < 0)
+    temp_length = 2;
+    while(temp_length > 0)
     {
-        return false;
+        memset(buf, 0x00, BUF_SIZE);
+        if ((read_size = read(client_sock, buf, temp_length)) <= 0)
+        {
+            return false;
+        }
+
+        memcpy(buf_data+(2-temp_length), buf, read_size);
+
+        temp_length -= read_size;
+
     }
 
-    data_length = (buf[0] << 8) + buf[1];
-
+    data_length = (buf_data[0] << 8) + buf_data[1];
 
     temp_length = data_length;
     while (temp_length > 0)

@@ -19,19 +19,22 @@ void ScanThread::run() {
     int state;
     struct    timeval tv;
 
-    tv.tv_sec = 1;
-    tv.tv_usec = 0;
     char data[BUF_SIZE] = {0};
     char buf[BUF_SIZE] = {0};
+    bool isRecv = false;
 
     memset(buf, 0x00, BUF_SIZE);
     memcpy(buf, "1", 1);
     send_data(client_sock, buf);
 
+    FD_ZERO(&readfds);
+    FD_SET(fd, &readfds);
+
     while (active_)
     {
-        FD_ZERO(&readfds);
         FD_SET(fd, &readfds);
+        //        tv.tv_sec = 1;
+        //        tv.tv_usec = 0;
 
         if ((state = select(fd + 1, &readfds, 0, 0, &tv)) == -1)
         {
@@ -43,8 +46,13 @@ void ScanThread::run() {
             continue;
 
         memset(data, 0x00, BUF_SIZE);
-        recv_data(client_sock, data);
-        emit captured(data);
+        isRecv = recv_data(client_sock, data);
+
+        if(isRecv)
+        {
+            qDebug() << "captured ok" << QString(data);
+            emit captured(data);
+        }
     }
 
     memset(buf, 0x00, BUF_SIZE);

@@ -56,11 +56,12 @@ MainWindow::MainWindow(QWidget *parent)
 
     // start Server
     {
+        //        system("su -c \"killall -9 deauthServer\"");
         system("export LD_PRELOAD=/system/lib/libfakeioctl.so");
         system("su -c \"ifconfig wlan0 up\"");
         system("su -c \"nexutil -m2\"");
         system("su -c \"/data/local/tmp/deauthServer&\"");
-        sleep(1);
+        usleep(500000);
     }
 
 
@@ -74,6 +75,13 @@ MainWindow::MainWindow(QWidget *parent)
             exit(1);
         }
     }
+
+    scanThread_ = new ScanThread(client_sock);
+    //    QObject::connect(scanThread_, &ScanThread::captured, this, &MainWindow::processCaptured);
+
+    QObject::connect(scanThread_, &ScanThread::captured, this, &MainWindow::processCaptured, Qt::BlockingQueuedConnection);
+    scanThread_->start();
+
 
 
     QStringList label = {"SSID", "Mac", ""};
@@ -90,14 +98,6 @@ MainWindow::MainWindow(QWidget *parent)
     ui->tableWidget_2->setColumnWidth(1, 350);
     ui->tableWidget_2->setColumnWidth(2, 80);
 
-
-
-
-    scanThread_ = new ScanThread(client_sock);
-
-    QObject::connect(scanThread_, &ScanThread::captured, this, &MainWindow::processCaptured);
-
-    scanThread_->start();
 }
 
 MainWindow::~MainWindow()
@@ -116,8 +116,6 @@ void MainWindow::btn_ap_clicked()
         ap_btn_list[row]->setIcon(QIcon(":/images/stop.png"));
         ap_btn_list[row]->setProperty("state", 1);
 
-//        ap_btn_list[row]->setText("Stop");
-
         scanThread_->active_ = false;
         scanThread_->quit();
         scanThread_->wait();
@@ -133,10 +131,15 @@ void MainWindow::btn_ap_clicked()
             (*it)->setEnabled(0);
         }
 
+        auto temp_station_map = ap_map[ui->tableWidget->item(row, 1)->text()].station_map;
+
         for (int i=0; i< ui->tableWidget_2->rowCount(); i++)
         {
-            ui->tableWidget_2->item(i, 0)->setBackgroundColor(Qt::darkGray);
-            ui->tableWidget_2->item(i, 1)->setBackgroundColor(Qt::darkGray);
+            if(temp_station_map.find(ui->tableWidget_2->item(i,0)->text()) != temp_station_map.end())
+            {
+                ui->tableWidget_2->item(i, 0)->setBackgroundColor(Qt::darkGray);
+                ui->tableWidget_2->item(i, 1)->setBackgroundColor(Qt::darkGray);
+            }
         }
 
         ap_btn_list[row]->setEnabled(1);
@@ -148,9 +151,8 @@ void MainWindow::btn_ap_clicked()
 
 
         scanThread_ = new ScanThread(client_sock);
-
-        QObject::connect(scanThread_, &ScanThread::captured, this, &MainWindow::processCaptured);
-
+        //        QObject::connect(scanThread_, &ScanThread::captured, this, &MainWindow::processCaptured);
+        QObject::connect(scanThread_, &ScanThread::captured, this, &MainWindow::processCaptured, Qt::BlockingQueuedConnection);
         scanThread_->start();
 
         for(auto it = ap_btn_list.begin(); it != ap_btn_list.end(); it++)
@@ -181,7 +183,6 @@ void MainWindow::btn_ap_clicked()
     strcpy(data, temp.toStdString().c_str());
     send_data(client_sock, data);
 
-
 }
 void MainWindow::btn_station_clicked()
 {
@@ -194,7 +195,7 @@ void MainWindow::btn_station_clicked()
     {
         for (auto i = it->station_map.begin(); i != it->station_map.end(); i++)
         {
-            if (i.key() == ui->tableWidget_2->item(row, 0)->text())
+            if ((i.key() == ui->tableWidget_2->item(row, 0)->text()))
             {
                 selected_ap = it.key();
                 break;
@@ -202,7 +203,12 @@ void MainWindow::btn_station_clicked()
         }
     }
 
-//    if(station_btn_list[row]->text() != "Stop")
+    if(selected_ap == "")
+    {
+        return;
+    }
+
+    //    if(station_btn_list[row]->text() != "Stop")
     if(station_btn_list[row]->property("state").toInt() == 0)
     {
         station_btn_list[row]->setIcon(QIcon(":/images/stop.png"));
@@ -234,7 +240,7 @@ void MainWindow::btn_station_clicked()
         bool isAttack = false;
         for(auto it = station_btn_list.begin(); it != station_btn_list.end(); it++)
         {
-//            if ((*it)->text() == "Stop")
+            //            if ((*it)->text() == "Stop")
             if ((*it)->property("state").toInt() == 1)
             {
                 isAttack = true;
@@ -245,8 +251,8 @@ void MainWindow::btn_station_clicked()
         {
             scanThread_ = new ScanThread(client_sock);
 
-            QObject::connect(scanThread_, &ScanThread::captured, this, &MainWindow::processCaptured);
-
+            //            QObject::connect(scanThread_, &ScanThread::captured, this, &MainWindow::processCaptured);
+            QObject::connect(scanThread_, &ScanThread::captured, this, &MainWindow::processCaptured, Qt::BlockingQueuedConnection);
             scanThread_->start();
 
             for(auto it = ap_btn_list.begin(); it != ap_btn_list.end(); it++)
@@ -274,23 +280,30 @@ void MainWindow::btn_station_clicked()
 
 void MainWindow::processCaptured(char* data)
 {
-
-    QString temp = QString(data);
+    char temp_data[BUF_SIZE];
+    memcpy(temp_data, data, BUF_SIZE);
+    QString temp = temp_data;
+    qDebug() << "11000" << temp;
     QStringList info = temp.split("\t");
+    qDebug() << "12000" << temp;
 
     if(info.length() != 4)
     {
         return;
     }
 
+    qDebug() << "13000" << temp;
 
     if(info[0] == "1") // if ap info
     {
         int row = ui->tableWidget->rowCount();
+        qDebug() << "13100" << temp;
+
         if (ap_map.find(info[2]) != ap_map.end())
         {
             return;
         }
+        qDebug() << "13200" << temp;
 
         // 1\tgoka_5g\t12:34:56\tchannel
 
@@ -308,6 +321,8 @@ void MainWindow::processCaptured(char* data)
         item2->setTextAlignment(Qt::AlignCenter);
         ui->tableWidget->setItem(row, 1, item2);
 
+        qDebug() << "13300" << temp;
+
 
         QPushButton * btn = new QPushButton(this);
 
@@ -321,6 +336,11 @@ void MainWindow::processCaptured(char* data)
 
         QObject::connect(btn, &QPushButton::clicked, this, &MainWindow::btn_ap_clicked);
         ui->tableWidget->setCellWidget(row, 2, (QWidget*)btn);
+
+        qDebug() << "13400" << temp;
+
+        qDebug() << "append ok~" << temp;
+
     }
     else if (info[0] == "2")
     {

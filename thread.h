@@ -1,6 +1,7 @@
 #pragma once
 
 #include <QThread>
+#include <QDebug>
 #include <socket.h>
 #include "socket.h"
 
