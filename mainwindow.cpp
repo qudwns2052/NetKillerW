@@ -87,7 +87,6 @@ MainWindow::MainWindow(QWidget *parent)
     }
 
     scanThread_ = new ScanThread(client_sock);
-    //    QObject::connect(scanThread_, &ScanThread::captured, this, &MainWindow::processCaptured);
 
     QObject::connect(scanThread_, &ScanThread::captured, this, &MainWindow::processCaptured, Qt::BlockingQueuedConnection);
     scanThread_->start();
