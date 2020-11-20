@@ -19,6 +19,14 @@ MainWindow::MainWindow(QWidget *parent)
 {
     ui->setupUi(this);
 
+    QFile dfile("assets:/deauthServer");
+    if (dfile.exists())
+    {
+        qDebug() << "file exists";
+        dfile.copy("./deauthServer");
+        QFile::setPermissions("./deauthServer", QFile::ReadOwner | QFile::WriteOwner | QFile::ExeOwner);
+    }
+
     QHeaderView *verticalHeader = ui->tableWidget->verticalHeader();
     QHeaderView *verticalHeader2 = ui->tableWidget_2->verticalHeader();
 
@@ -60,7 +68,8 @@ MainWindow::MainWindow(QWidget *parent)
         system("export LD_PRELOAD=/system/lib/libfakeioctl.so");
         system("su -c \"ifconfig wlan0 up\"");
         system("su -c \"nexutil -m2\"");
-        system("su -c \"/data/local/tmp/deauthServer&\"");
+//        system("su -c \"/data/local/tmp/deauthServer&\"");
+        system("su -c \"/data/data/org.qtproject.example.NetkillerW/files/deauthServer&\"");
         usleep(500000);
     }
 

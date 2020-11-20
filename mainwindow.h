@@ -6,6 +6,7 @@
 #include <QMap>
 #include <QScrollBar>
 #include <QFontDatabase>
+#include <QFile>
 #include "socket.h"
 #include "thread.h"
 
