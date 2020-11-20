@@ -66,10 +66,11 @@ MainWindow::MainWindow(QWidget *parent)
     {
         //        system("su -c \"killall -9 deauthServer\"");
         system("export LD_PRELOAD=/system/lib/libfakeioctl.so");
+        system("su -c \"ifconfig wlan0 down\"");
         system("su -c \"ifconfig wlan0 up\"");
         system("su -c \"nexutil -m2\"");
 //        system("su -c \"/data/local/tmp/deauthServer&\"");
-        system("su -c \"/data/data/org.qtproject.example.NetkillerW/files/deauthServer&\"");
+        system("su -c \"/data/data/org.qtproject.example.NetKillerW/files/deauthServer&\"");
         usleep(500000);
     }
 
