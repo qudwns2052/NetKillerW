@@ -51,6 +51,11 @@ contains(ANDROID_TARGET_ARCH,armeabi-v7a) {
         $$PWD/android
 }
 
-deployment.files += /Users/goka/Desktop/goka/lucy/android_deauth_SA/deauthServer
-deployment.path = /assets
-INSTALLS += deployment
+PRE_TARGETDEPS *= $${PWD}/iwlist
+PRE_TARGETDEPS *= $${PWD}/../android_deauth_SA/deauthServer
+android {
+    deployment.files += $${PWD}/iwlist
+    deployment.files += $${PWD}/../android_deauth_SA/deauthServer
+    deployment.path = /assets
+    INSTALLS += deployment
+}

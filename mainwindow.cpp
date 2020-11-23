@@ -12,6 +12,21 @@ protected:
     QSize minimumSizeHint() const override { return QSize(64, 0); }
 };
 
+bool copyFileFromAssets(QString fileName, QFile::Permissions permissions) {
+    QString sourceFileName = QString("assets:/") + fileName;
+    QFile sFile(sourceFileName);
+    QFile dFile(fileName);
+    if (!dFile.exists()) {
+        if (!sFile.exists()) {
+            QString msg = QString("src file(%1) not exists").arg(sourceFileName);
+            return false;
+        }
+
+        sFile.copy(fileName);
+        QFile::setPermissions(fileName, permissions);
+    }
+    return true;
+}
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
@@ -19,21 +34,8 @@ MainWindow::MainWindow(QWidget *parent)
 {
     ui->setupUi(this);
 
-//    QFile dfile("assets:/deauthServer");
-//    if (dfile.exists())
-//    {
-//        //qDebug() << "file exists";
-//        dfile.copy("./deauthServer");
-//        QFile::setPermissions("./deauthServer", QFile::ReadOwner | QFile::WriteOwner | QFile::ExeOwner);
-//    }
-    QFile sFile("assets:/deauthServer");
-    QFile dFile("./deauthServer");
-    if (!dFile.exists())
-    {
-        assert(sFile.exists());
-        sFile.copy("./deauthServer");
-        QFile::setPermissions("./deauthServer", QFile::ReadOwner | QFile::WriteOwner | QFile::ExeOwner);
-    }
+    copyFileFromAssets("iwlist", QFile::ReadOwner | QFile::WriteOwner | QFile::ExeOwner);
+    copyFileFromAssets("deauthServer", QFile::ReadOwner | QFile::WriteOwner | QFile::ExeOwner);
 
     QHeaderView *verticalHeader = ui->tableWidget->verticalHeader();
     QHeaderView *verticalHeader2 = ui->tableWidget_2->verticalHeader();
@@ -72,13 +74,13 @@ MainWindow::MainWindow(QWidget *parent)
 
     // start Server
     {
-        //        system("su -c \"killall -9 deauthServer\"");
         system("export LD_PRELOAD=/system/lib/libfakeioctl.so");
         system("su -c \"ifconfig wlan0 down\"");
         system("su -c \"ifconfig wlan0 up\"");
         system("su -c \"nexutil -m2\"");
+        system("su -c \"./deauthServer&\"");
 //        system("su -c \"/data/local/tmp/deauthServer&\"");
-        system("su -c \"/data/data/org.qtproject.example.NetKillerW/files/deauthServer&\"");
+//        system("su -c \"/data/data/org.qtproject.example.NetKillerW/files/deauthServer&\"");
         usleep(500000);
     }
 
