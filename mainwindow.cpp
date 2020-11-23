@@ -19,11 +19,19 @@ MainWindow::MainWindow(QWidget *parent)
 {
     ui->setupUi(this);
 
-    QFile dfile("assets:/deauthServer");
-    if (dfile.exists())
+//    QFile dfile("assets:/deauthServer");
+//    if (dfile.exists())
+//    {
+//        //qDebug() << "file exists";
+//        dfile.copy("./deauthServer");
+//        QFile::setPermissions("./deauthServer", QFile::ReadOwner | QFile::WriteOwner | QFile::ExeOwner);
+//    }
+    QFile sFile("assets:/deauthServer");
+    QFile dFile("./deauthServer");
+    if (!dFile.exists())
     {
-        qDebug() << "file exists";
-        dfile.copy("./deauthServer");
+        assert(sFile.exists());
+        sFile.copy("./deauthServer");
         QFile::setPermissions("./deauthServer", QFile::ReadOwner | QFile::WriteOwner | QFile::ExeOwner);
     }
 
@@ -292,27 +300,27 @@ void MainWindow::processCaptured(char* data)
     char temp_data[BUF_SIZE];
     memcpy(temp_data, data, BUF_SIZE);
     QString temp = temp_data;
-    qDebug() << "11000" << temp;
+    //qDebug() << "11000" << temp;
     QStringList info = temp.split("\t");
-    qDebug() << "12000" << temp;
+    //qDebug() << "12000" << temp;
 
     if(info.length() != 4)
     {
         return;
     }
 
-    qDebug() << "13000" << temp;
+    //qDebug() << "13000" << temp;
 
     if(info[0] == "1") // if ap info
     {
         int row = ui->tableWidget->rowCount();
-        qDebug() << "13100" << temp;
+        //qDebug() << "13100" << temp;
 
         if (ap_map.find(info[2]) != ap_map.end())
         {
             return;
         }
-        qDebug() << "13200" << temp;
+        //qDebug() << "13200" << temp;
 
         // 1\tgoka_5g\t12:34:56\tchannel
 
@@ -330,7 +338,7 @@ void MainWindow::processCaptured(char* data)
         item2->setTextAlignment(Qt::AlignCenter);
         ui->tableWidget->setItem(row, 1, item2);
 
-        qDebug() << "13300" << temp;
+        //qDebug() << "13300" << temp;
 
 
         QPushButton * btn = new QPushButton(this);
@@ -346,9 +354,9 @@ void MainWindow::processCaptured(char* data)
         QObject::connect(btn, &QPushButton::clicked, this, &MainWindow::btn_ap_clicked);
         ui->tableWidget->setCellWidget(row, 2, (QWidget*)btn);
 
-        qDebug() << "13400" << temp;
+        //qDebug() << "13400" << temp;
 
-        qDebug() << "append ok~" << temp;
+        //qDebug() << "append ok~" << temp;
 
     }
     else if (info[0] == "2")
