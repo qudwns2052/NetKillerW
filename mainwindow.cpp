@@ -121,7 +121,7 @@ MainWindow::MainWindow(QWidget *parent)
 
 MainWindow::~MainWindow()
 {
-    system("su -c \"killall -9 deauthServer\"");
+    system("su -c \"pkill deauthServer\"");
     delete ui;
 }
 
