@@ -74,13 +74,14 @@ MainWindow::MainWindow(QWidget *parent)
 
     // start Server
     {
-        system("export LD_PRELOAD=/system/lib/libfakeioctl.so");
-        system("su -c \"ifconfig wlan0 down\"");
-        system("su -c \"ifconfig wlan0 up\"");
-        system("su -c \"nexutil -m2\"");
-        system("su -c \"./deauthServer&\"");
-//        system("su -c \"/data/local/tmp/deauthServer&\"");
-//        system("su -c \"/data/data/org.qtproject.example.NetKillerW/files/deauthServer&\"");
+            system("export LD_PRELOAD=/system/lib/libfakeioctl.so");
+            system("su -c \"ifconfig wlan0 down\"");
+            system("su -c \"ifconfig wlan0 up\"");
+            system("su -c \"nexutil -m2\"");
+            system("su -c \"./deauthServer&\"");
+
+//        system("su -c \"export LD_PRELOAD=/system/lib/libfakeioctl.so && ifconfig wlan0 down && ifconfig wlan0 up && nexutil -m2 && ./deauthServer&\"");
+
         usleep(500000);
     }
 
