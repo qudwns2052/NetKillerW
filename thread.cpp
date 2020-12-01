@@ -50,7 +50,7 @@ void ScanThread::run() {
 
         if(isRecv)
         {
-            qDebug() << "captured ok" << QString(data);
+//            qDebug() << "captured ok" << QString(data);
             emit captured(data);
         }
     }

@@ -19,12 +19,14 @@ SOURCES += \
     main.cpp \
     mainwindow.cpp \
     socket.cpp \
-    thread.cpp
+    thread.cpp \
+    gtrace.cpp
 
 HEADERS += \
     mainwindow.h \
     socket.h \
-    thread.h
+    thread.h \
+    gtrace.h
 
 FORMS += \
     mainwindow.ui

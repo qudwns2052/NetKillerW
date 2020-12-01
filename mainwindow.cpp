@@ -122,7 +122,11 @@ MainWindow::MainWindow(QWidget *parent)
 
 MainWindow::~MainWindow()
 {
-    system("su -c \"pkill deauthServer\"");
+    qDebug() << "try su -c \"pkill deauthServer\"";
+    int res = system("su -c \"pkill deauthServer\"");
+    qDebug() << "system return = " << res;
+    qDebug() << "NetKillerW End (MainWindow)";
+
     delete ui;
 }
 
@@ -303,7 +307,7 @@ void MainWindow::processCaptured(char* data)
     char temp_data[BUF_SIZE];
     memcpy(temp_data, data, BUF_SIZE);
     QString temp = temp_data;
-    //qDebug() << "11000" << temp;
+    qDebug() << "processCaptured" << temp;
     QStringList info = temp.split("\t");
     //qDebug() << "12000" << temp;
 
