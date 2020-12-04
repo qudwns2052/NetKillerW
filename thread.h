@@ -4,6 +4,7 @@
 #include <QDebug>
 #include <socket.h>
 #include "socket.h"
+#include "gtrace.h"
 
 struct ScanThread : QThread {
     Q_OBJECT

@@ -9,6 +9,7 @@
 #include <QFile>
 #include "socket.h"
 #include "thread.h"
+#include "gtrace.h"
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }

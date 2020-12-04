@@ -1,6 +1,5 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
-#include "thread.h"
 
 class MyScrollBar : public QScrollBar
 {
@@ -92,7 +91,7 @@ MainWindow::MainWindow(QWidget *parent)
     {
         if(!connect_sock(&client_sock, server_port))
         {
-            printf("connection error\n");
+            GTRACE("connection error");
             exit(1);
         }
     }
@@ -122,16 +121,18 @@ MainWindow::MainWindow(QWidget *parent)
 
 MainWindow::~MainWindow()
 {
-    qDebug() << "try su -c \"pkill deauthServer\"";
+    GTRACE("try su -c \"pkill deauthServer\"");
     int res = system("su -c \"pkill deauthServer\"");
-    qDebug() << "system return = " << res;
-    qDebug() << "NetKillerW End (MainWindow)";
+    GTRACE("system return = %d", res);
+    GTRACE("NetKillerW End (MainWindow)");
 
     delete ui;
 }
 
 void MainWindow::btn_ap_clicked()
 {
+    GTRACE("btn_ap_clicked");
+
     QPushButton *pb = qobject_cast<QPushButton *>(QObject::sender());
     int row = pb->property("my_key").toInt();
 
@@ -210,6 +211,7 @@ void MainWindow::btn_ap_clicked()
 }
 void MainWindow::btn_station_clicked()
 {
+    GTRACE("btn_station_clicked");
     QPushButton *pb = qobject_cast<QPushButton *>(QObject::sender());
     int row = pb->property("my_key").toInt();
 
@@ -307,27 +309,27 @@ void MainWindow::processCaptured(char* data)
     char temp_data[BUF_SIZE];
     memcpy(temp_data, data, BUF_SIZE);
     QString temp = temp_data;
-    qDebug() << "processCaptured" << temp;
+    GTRACE("processCaptured = %s",temp.toStdString().c_str());
     QStringList info = temp.split("\t");
-    //qDebug() << "12000" << temp;
 
     if(info.length() != 4)
     {
         return;
     }
 
-    //qDebug() << "13000" << temp;
+    GTRACE("13000");
 
     if(info[0] == "1") // if ap info
     {
         int row = ui->tableWidget->rowCount();
-        //qDebug() << "13100" << temp;
+        GTRACE("13100");
 
         if (ap_map.find(info[2]) != ap_map.end())
         {
             return;
         }
-        //qDebug() << "13200" << temp;
+
+        GTRACE("13200");
 
         // 1\tgoka_5g\t12:34:56\tchannel
 
@@ -345,7 +347,7 @@ void MainWindow::processCaptured(char* data)
         item2->setTextAlignment(Qt::AlignCenter);
         ui->tableWidget->setItem(row, 1, item2);
 
-        //qDebug() << "13300" << temp;
+        GTRACE("13300");
 
 
         QPushButton * btn = new QPushButton(this);
@@ -361,9 +363,8 @@ void MainWindow::processCaptured(char* data)
         QObject::connect(btn, &QPushButton::clicked, this, &MainWindow::btn_ap_clicked);
         ui->tableWidget->setCellWidget(row, 2, (QWidget*)btn);
 
-        //qDebug() << "13400" << temp;
-
-        //qDebug() << "append ok~" << temp;
+        GTRACE("13400");
+        GTRACE("append ok");
 
     }
     else if (info[0] == "2")
@@ -400,6 +401,7 @@ void MainWindow::processCaptured(char* data)
 
 void MainWindow::on_tableWidget_cellDoubleClicked(int row, int column)
 {
+    GTRACE("cellDoubleClicked");
 
     station_btn_list.clear();
 
