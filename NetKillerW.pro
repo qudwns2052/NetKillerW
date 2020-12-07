@@ -54,10 +54,14 @@ contains(ANDROID_TARGET_ARCH,armeabi-v7a) {
 }
 
 PRE_TARGETDEPS *= $${PWD}/iwlist
+PRE_TARGETDEPS *= $${PWD}/iwconfig
 PRE_TARGETDEPS *= $${PWD}/../android_deauth_SA/deauthServer
+PRE_TARGETDEPS *= $${PWD}/../android_deauth_SA/deauthServer.sh
 android {
     deployment.files += $${PWD}/iwlist
+    deployment.files += $${PWD}/iwconfig
     deployment.files += $${PWD}/../android_deauth_SA/deauthServer
+    deployment.files += $${PWD}/../android_deauth_SA/deauthServer.sh
     deployment.path = /assets
     INSTALLS += deployment
 }

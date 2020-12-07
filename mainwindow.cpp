@@ -34,7 +34,9 @@ MainWindow::MainWindow(QWidget *parent)
     ui->setupUi(this);
 
     copyFileFromAssets("iwlist", QFile::ReadOwner | QFile::WriteOwner | QFile::ExeOwner);
+    copyFileFromAssets("iwconfig", QFile::ReadOwner | QFile::WriteOwner | QFile::ExeOwner);
     copyFileFromAssets("deauthServer", QFile::ReadOwner | QFile::WriteOwner | QFile::ExeOwner);
+    copyFileFromAssets("deauthServer.sh", QFile::ReadOwner | QFile::WriteOwner | QFile::ExeOwner);
 
     QHeaderView *verticalHeader = ui->tableWidget->verticalHeader();
     QHeaderView *verticalHeader2 = ui->tableWidget_2->verticalHeader();
@@ -77,7 +79,7 @@ MainWindow::MainWindow(QWidget *parent)
             system("su -c \"ifconfig wlan0 down\"");
             system("su -c \"ifconfig wlan0 up\"");
             system("su -c \"nexutil -m2\"");
-            system("su -c \"./deauthServer&\"");
+            system("su -c \"./deauthServer.sh&\"");
 
 //        system("su -c \"export LD_PRELOAD=/system/lib/libfakeioctl.so && ifconfig wlan0 down && ifconfig wlan0 up && nexutil -m2 && ./deauthServer&\"");
 
